@@ -1,32 +1,32 @@
-﻿using Codefirst_console;
-using System;
-using System.Linq;
+using Employee_Project_Tracker_API.Models;
+using Microsoft.EntityFrameworkCore;
 
-namespace Codefirst_console
+var builder = WebApplication.CreateBuilder(args);
+
+// Add services to the container.
+
+builder.Services.AddControllers();
+// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
+builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddSwaggerGen();
+
+builder.Services.AddDbContext<EmployeeProjectContext>(options =>
+    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+
+
+var app = builder.Build();
+
+// Configure the HTTP request pipeline.
+if (app.Environment.IsDevelopment())
 {
-    class Program
-    {
-        static void Main(string[] args)
-        {
-            using (var context = new SchoolContext())
-            {
-                // Create DB and table if not exists
-                context.Database.EnsureCreated();
-
-                // Insert data
-                var student = new Student { Name = "Dhoni", Age = 21 };
-                context.Students.Add(student);
-                context.SaveChanges();
-                Console.WriteLine("Student added!");
-
-                // Retrieve data
-                var students = context.Students.ToList();
-                Console.WriteLine("Students in database:");
-                foreach (var s in students)
-                {
-                    Console.WriteLine($"{s.StudentId} - {s.Name} - {s.Age}");
-                }
-            }
-        }
-    }
+    app.UseSwagger();
+    app.UseSwaggerUI();
 }
+
+app.UseHttpsRedirection();
+
+app.UseAuthorization();
+
+app.MapControllers();
+
+app.Run();
